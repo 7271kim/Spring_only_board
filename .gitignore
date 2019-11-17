@@ -1,0 +1,13 @@
+**/target
+**/.settings
+**/.project
+**/.classpath
+**/node_modules
+**/.vlt-sync.log
+/bin/
+.history/
+.springBeans
+.springWebflow
+
+**/*.properties
+**/mailsender.xml

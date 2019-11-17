@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sisimboard">
+    <!-- AUTHORIZATION 관라지가 쓴 글은 공지가 되어 맨 상단에 올리기 위해 처리 -->
+    <!-- 해당 글에 대한 댓글이 몇개인지 서브쿼리로 처리 -->
+    <!-- ISCHILD = 0 이면 일반  댓글 -->
+    <select id="getbordList" parameterType="boardbean" resultType="boardbean" >
+        SELECT SEQ, ID, USEFLAG, READCOUNT, SCRIPT, STITLE, SCONTENT, SFILE_NAME SFILENAME, SFILE_PATTH SFILEPATH,SGROUP,SSTEP,SINDENT,PW,
+               DATE_FORMAT(SJOINDATE,'%Y-%m-%d %H:%i:%S') AS SJOINDATE,
+               DATE_FORMAT(SJOINUPDATE,'%Y-%m-%d %H:%i:%S') AS SJOINUPDATE
+        FROM reenee_board
+        WHERE 1 = 1
+        <if test="where != null and where != ''">
+            <foreach collection="where" item="value" index="key">
+                AND ${key}=#{value} 
+            </foreach>
+        </if>
+        <if test="whereNot != null and whereNot != ''">
+            <foreach collection="whereNot" item="value" index="key">
+                AND ${key}!=#{value} 
+            </foreach>
+        </if>
+        <if test="like != null and like != ''">
+            AND
+            <foreach collection="like" item="value" index="key" separator="OR">
+                ${key} LIKE CONCAT('%',#{value},'%')
+            </foreach>
+        </if>
+        ORDER BY SEQ DESC
+        <if test="limitEnd != null and limitEnd != ''">
+           LIMIT #{limitStart}, #{limitEnd}
+        </if>
+    </select>
+    
+    <!-- Insert 성공시 기본 return- 1 (여러개일경우도 1) , Update - Update된 행의 개수 반환 (없다면 0), delete - Delete된 행의개수 (없다면 0) -->
+    <!-- 방금 Insert한 결과를 바로 가지고 가고 싶은 경우! selectKey를 사용! keyProperty="가지고 가고자 하는 원하는 컬럼명" -->
+    <!-- 방금 Insert한 결과가 membean에 담겨서 돌아간다. -> DAO에서 받을 수 있음! -->
+    <!-- 폰 번호는 복호화 가능한 키로 할 것임 -->
+
+    <insert id="boardInsert" parameterType="boardbean">
+    INSERT INTO reenee_board
+            (ID,STITLE,SCONTENT,SFILE_NAME,SFILE_PATTH,PW,USEFLAG) 
+    VALUES ( #{id},#{sTitle},#{sContent},#{sFilename},#{sFilepath},#{pw},#{useFlag});
+        <selectKey resultType="int" keyProperty="seq" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <!-- 업데이트는 항상 조심! 잘못할 경우 전체 업데이트가 되버리는 불상사가 발생 0도 = '' 이거로 인식함 -->
+    <update id="boardUpdate" parameterType="boardbean">
+        UPDATE reenee_board
+            <trim prefix="SET" suffixOverrides=",">
+               <if test="id != null and id != ''">ID=#{id},</if>
+               <if test="useFlag != null and useFlag != ''">USEFLAG=#{useFlag},</if>
+               <if test="readCount != null and readCount != ''">READCOUNT=#{readCount},</if>
+               <if test="script != null and script != ''">SCRIPT=#{script},</if>
+               <if test="sTitle != null and sTitle != ''">STITLE=#{sTitle},</if>
+               <if test="sContent != null and sContent != ''">SCONTENT=#{sContent},</if>
+               <if test="sFilepath != null and sFilepath != ''">SFILE_PATTH=#{sFilepath},</if>
+               <if test="sFilename != null and sFilename != ''">SFILE_NAME=#{sFilename},</if>
+               <if test="sJoinUpdate != null and sJoinUpdate != ''">SJOINUPDATE=#{sJoinUpdate},</if>
+               <if test="sGroup != null and sGroup != ''">SGROUP=#{sGroup},</if>
+               <if test="sStep != null and sStep != ''">SSTEP=#{sStep},</if>
+               <if test="childrenCount != null and childrenCount != ''">CHILDRENCOUNT=#{childrenCount},</if>
+               <if test="sIndent != null and sIndent != ''">SINDENT=#{sIndent},</if>
+               <if test="pw != null and pw != ''">PW=#{pw}</if>
+            </trim>
+            WHERE 1 = 1
+                <if test="where != null and where != ''">
+                    <foreach collection="where" item="value" index="key">
+                        AND ${key}=#{value} 
+                    </foreach>
+                </if>
+                <if test="whereNot != null and whereNot != ''">
+                    <foreach collection="whereNot" item="value" index="key">
+                     AND ${key}!=#{value} 
+                     </foreach>
+                </if>
+                <if test="like != null and like != ''">
+                    <foreach collection="like" item="value" index="key">
+                        AND ${key} LIKE CONCAT('%',#{value},'%')
+                    </foreach>
+                </if>
+                
+        <selectKey resultType="int" keyProperty="seq" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </update>
+</mapper>
+

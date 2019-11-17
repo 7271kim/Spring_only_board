@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 초기 기본 설정 -->
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+    <!-- Appender( 전달된 로그를 어디에 출력할지 정하는 것) 4개 쓸 것임 :  -->
+    <!-- 1. 콘솔 관련  -->
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HHmmss.SSS} [%-5p] %c{1}.%M():%L %m%n" />
+        </layout>
+    </appender>
+    
+    <!-- RollingFileAppender: Daily는 용량을 지정할 수 없지만 이것은 가능. 1개로 로그 전체 관리  -->
+    <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="encoding" value="UTF-8" />
+        <!-- 개발 운용에 따라 로그 위치 수정해줘야 한다. -->
+        <param name="File" value="/home/tomcat/log/com.honbab.tomcat_log.log" />
+        
+        <!-- 최대 백업 개수 : 1개로 설정되면 이전 1개만 백업된다. -->
+        <param name="MaxFileSize" value="1MB" />
+        <param name="MaxBackupIndex" value="1" />
+        
+        <!-- 이전파일에 덮어 쓸 것인지 -->
+        <param name="Append" value="true"/>
+        <!-- 기본 출력 설정 -->
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+        </layout>
+    </appender>
+    
+    <!-- 매일매일 생성되는 로그파일 관리시  -->
+    <appender name="dailyFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="encoding" value="UTF-8" />
+        <param name="DatePattern" value="'_'yyyyMMdd"/>
+        <!-- 개발 운용에 따라 로그 위치 수정해줘야 한다. -->
+        <param name="File" value="/home/tomcat/log/com.honbab.tomcat_log_day.log" />
+        <param name="Append" value="true"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+        </layout>
+    </appender>
+    
+    <!-- 에러만 뫃아놓을 로그파일  -->
+    <appender name="errFile" class="org.apache.log4j.RollingFileAppender">
+        <param name="Threshold" value="ERROR"/>
+        <param name="encoding" value="UTF-8" />
+        <!-- 추후 경로 수정해줘야 함. -->
+        <param name="File" value="/home/tomcat/log/com.honbab.tomcat_log_err.log" />
+        <param name="MaxFileSize" value="1MB" />
+        <param name="MaxBackupIndex" value="1" />
+        <param name="Append" value="true"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+        </layout>
+        <!-- 출력형식 -->
+    </appender>
+    
+    <!-- 특정 패키지 출력 형식 지정 -->
+    <!-- development production -->
+    <!-- jdbc.connection : WARN WARN -->
+    <!-- jdbc.audit : WARN WARN -->
+    <!-- jdbc.sqlonly : WARN WARN -->
+    <!-- jdbc.sqltiming : INFO WARN -->
+    <!-- jdbc.resultset : WARN WARN -->
+    <!-- jdbc.resultsettable : INFO WARN -->
+    
+    <!-- ===================================== -->
+    <!-- Possible Log Levels: -->
+    <!-- ===================================== -->
+    <!-- FATAL, ERROR, WARN, INFO, DEBUG, TRACE -->
+    
+    
+    <!-- DB 관련 -->
+    <logger name="jdbc.connection" additivity="false">
+        <level value="WARN" />
+        <!-- 저장되는 곳 설정 -->
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.audit" additivity="false">
+        <level value="WARN" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.sqlonly" additivity="false">
+        <level value="WARN" />
+        <appender-ref ref="console" />
+        <appender-ref ref="errFile" />
+    </logger>
+    <logger name="jdbc.sqltiming" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.resultset" additivity="false">
+        <level value="WARN" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.resultsettable" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </logger>
+    
+    <!-- Application Loggers -->
+    <logger name="com.honbabzone.tomcat">
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </logger>
+    
+    <!-- Spring Frame work -->
+   <logger name="org.springframework">
+        <level value="ERROR"/>
+        <appender-ref ref="console" />
+        <appender-ref ref="errFile" />
+    </logger>
+
+    <!-- Root Logger -->
+    <!-- 기본 출력 설정 DEBUG모드 : 디버그 관련 저장될 위치  -->
+    <root>
+        <priority value="DEBUG" />
+        <appender-ref ref="console" />
+        <appender-ref ref="fileAppender" />
+    </root>
+    
+</log4j:configuration>

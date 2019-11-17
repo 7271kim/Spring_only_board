@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="false" />
+		<!-- 각 매퍼에 설정된 캐시를 전역적으로 사용할 것인지(true가 디폴트) -->
+		<setting name="useGeneratedKeys" value="true" />
+		<!-- 생성키에 대한 JDBC지원 허용 : fale가 디폴트 => 뭐지 -->
+		<setting name="defaultExecutorType" value="REUSE" />
+		<!-- 디폴트 실행자 결정 - simple이 기본, reuse면 실행자 preareStatemant를 재 새용함 -->
+	</settings>
+
+	<typeAliases>
+        <typeAlias type="com.renee.jin.model.BoardBean" alias="boardbean" />
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="sqlMap/mem/simsimboard.xml" />
+	</mappers>
+
+</configuration>
+
+
+

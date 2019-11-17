@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 초기 기본 설정 -->
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+    <!-- Appender( 전달된 로그를 어디에 출력할지 정하는 것) 4개 쓸 것임 :  -->
+    <!-- 1. 콘솔 관련  -->
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HHmmss.SSS} [%-5p] %c{1}.%M():%L %m%n" />
+        </layout>
+    </appender>
+    
+    
+    
+    <!-- DB 관련 -->
+    <logger name="jdbc.connection" additivity="false">
+        <level value="WARN" />
+        <!-- 저장되는 곳 설정 -->
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.audit" additivity="false">
+        <level value="WARN" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.sqlonly" additivity="false">
+        <level value="WARN" />
+        <appender-ref ref="console" />
+        <appender-ref ref="errFile" />
+    </logger>
+    <logger name="jdbc.sqltiming" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.resultset" additivity="false">
+        <level value="WARN" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc.resultsettable" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </logger>
+    
+    <!-- Application Loggers -->
+    <logger name="com.honbabzone.tomcat">
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </logger>
+    
+    <!-- Spring Frame work -->
+   <logger name="org.springframework">
+        <level value="ERROR"/>
+        <appender-ref ref="console" />
+        <appender-ref ref="errFile" />
+    </logger>
+
+    <!-- Root Logger -->
+    <!-- 기본 출력 설정 DEBUG모드 : 디버그 관련 저장될 위치  -->
+    <root>
+        <priority value="DEBUG" />
+        <appender-ref ref="console" />
+    </root>
+    
+</log4j:configuration>

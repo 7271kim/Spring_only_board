@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+    
+    
+    <!-- jdbc관련 시작 -->
+    <context:property-placeholder location="/WEB-INF/properties/jdbc.properties"/>
+    <!-- jdbc에 관한 외부 설정파일들 -->
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maxActive" value="30" />
+        <property name="maxIdle" value="10" />
+        <property name="maxWait" value="1000" />
+        <property name="defaultAutoCommit" value="true" />
+        <!--  드라이버는 반드시 "net.sf.log4jdbc.DriverSpy” 선언 해야 합니다. JDBC URL 설정시 “ jdbc:log4jdbc:oracle” 선언해야 한다.  -->
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!-- 학원에서 알려줬던 jdbc templet보다 더 BasicDataSource이게 더 커넥션 풀 관리가 쉽다. 폼에 2개 추가-->
+    <!-- jdbc관련 끝 -->
+    
+    <!-- 트랜잭션 관리! 나중에 찾아보기 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    
+    <!-- mybatis설정파일 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:sqlMap/mybatis_config.xml" />
+    </bean>
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory" />
+    </bean>
+    
+    <!-- 파일 첨부관련  -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="4194304" />
+        <!-- 최대 업로드 가능한 바이트 크기 (value : -1의 경우 : 무제한) : 현재 4M-->
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean> 
+    
+</beans>
